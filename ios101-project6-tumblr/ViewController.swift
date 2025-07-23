@@ -14,10 +14,35 @@ class ViewController: UIViewController, UITableViewDataSource {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = "The People of New York"
+        navigationController?.navigationBar.prefersLargeTitles = true
 
         tableView.dataSource = self
         fetchPosts()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
 
+        if let selectedIndexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: selectedIndexPath, animated: true)
+        }
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let cell = sender as? UITableViewCell,
+              let indexPath = tableView.indexPath(for: cell) else {
+            return
+        }
+
+        let post = posts[indexPath.row]
+
+        guard let detailViewController = segue.destination as? DetailViewController else {
+            return
+        }
+
+        detailViewController.post = post
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -67,9 +92,6 @@ class ViewController: UIViewController, UITableViewDataSource {
                     self?.tableView.reloadData()
 
                     print("✅ We got \(posts.count) posts!")
-                    for post in posts {
-                        print("🍏 Summary: \(post.summary)")
-                    }
                 }
 
             } catch {
